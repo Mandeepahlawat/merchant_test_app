@@ -11,15 +11,15 @@ class Merchant < ActiveRecord::Base
 
 	validates :name, :email, :status, :about, :gender, :price, :review_count, :avg_rating, presence: true
 
-	scope :with_openings, ->  {includes(:openings).where("openings.start_time <= ? AND openings.status = ?", 1.days.from_now, 0).order("start_time").references(:openings)}
+	# scope :with_openings, ->  {where("openings.start_time <= ? AND openings.status = ?", Time.zone.now.beginning_of_day + 2.days, 0).order("start_time")}
 
 	# scope :by_specialization, -> (specialization_ids) {where("specializations.id IN (?)", specialization_ids).references(:specializations)}
 	# scope :by_gender, -> (gender_ids) {where("merchants.gender IN (?)", gender_ids).references(:merchants)}
 	# scope :by_price_range, -> (start_val, end_val) {where('merchants.price <= ? and merchants.price >= ?', end_val, start_val)}
 	# scope :by_avg_rating, -> (ratings) {where('merchants.avg_rating <= ?', ratings)}
 	# scope :by_session_length, -> (start_val, end_val) {where('openings.session_time_in_sec <= ? and openings.session_time_in_sec >= ?', end_val.to_i * 60, start_val.to_i * 60).references(:openings)}
-	scope :by_availability, -> (start_val, end_val) {where("openings.start_time >= ? AND openings.start_time <= ? AND openings.status = ?", start_val, end_val, 0).references(:openings)}
-	scope	:available_right_now, -> {where("openings.start_time = ? AND openings.status = ?", Time.zone.now, 0).references(:openings)}
+	#scope :by_availability, -> (start_val, end_val) {where("openings.start_time >= ? AND openings.start_time <= ? AND openings.status = ?", start_val, end_val, 0).references(:openings)}
+	# scope	:available_right_now, -> {where("openings.start_time = ? AND openings.status = ?", Time.zone.now, 0).references(:openings)}
 	# scope :availability, -> {where("(openings.start_time = ? AND openings.status = ?) OR (openings.start_time >= ? AND openings.start_time <= ? AND openings.status = ?)", Time.zone.now, 0).references(:openings)}
 	
 

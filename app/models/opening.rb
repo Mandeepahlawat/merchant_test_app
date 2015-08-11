@@ -11,7 +11,7 @@ class Opening < ActiveRecord::Base
 
 	default_scope {order('start_time')}
 
-	scope :upto_tomorrow, ->  {where("openings.start_time <= ?", 1.days.from_now).order("start_time") }
+	scope :upto_tomorrow, ->  {where("openings.start_time <= ?", Time.zone.now.beginning_of_day + 2.days).order("start_time") }
 
 
 	private
