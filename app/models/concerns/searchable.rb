@@ -41,12 +41,9 @@ module Searchable
       end
     end
 
-    # Set up callbacks for updating the index on model changes
-    #
-    after_commit lambda { Indexer.perform_async(:index,  self.class.to_s, self.id) }, on: :create
-    after_commit lambda { Indexer.perform_async(:update, self.class.to_s, self.id) }, on: :update
-    after_commit lambda { Indexer.perform_async(:delete, self.class.to_s, self.id) }, on: :destroy
-    after_touch  lambda { Indexer.perform_async(:update, self.class.to_s, self.id) }
+    
+    #use default callbacks
+    include Elasticsearch::Model::Callbacks
 
     # Customize the JSON serialization for Elasticsearch
     #
@@ -56,7 +53,6 @@ module Searchable
                    openings:   { only: [:start_time, :end_time, :session_time_in_sec, :status] },
                    specializations: {only: [:name, :id]}
                  })
-      # hash['specializations'] = self.specializations.map(&:name)
       hash
     end
 
@@ -67,14 +63,11 @@ module Searchable
     #
     def self.search(query, options={})
 
-      # Prefill and set the filters (top-level `filter` and `facet_filter` elements)
+      # Prefill and set the filters (top-level `filter` elements)
       #
       __set_filters = lambda do |key, f|
         @search_definition[:filter][:and] ||= []
         @search_definition[:filter][:and]  |= [f]
-
-        # @search_definition[:facets][key.to_sym][:facet_filter][:and] ||= []
-        # @search_definition[:facets][key.to_sym][:facet_filter][:and]  |= [f]
       end
 
       @search_definition = {
@@ -89,29 +82,7 @@ module Searchable
           }
         },
 
-        filter: {},
-
-        # facets: {
-        #   specializations: {
-        #     terms: {
-        #       field: 'specializations'
-        #     },
-        #     facet_filter: {}
-        #   },
-        #   openings: {
-        #     terms: {
-        #       field: 'openings.start_time'
-        #     },
-        #     facet_filter: {}
-        #   },
-        #   published: {
-        #     date_histogram: {
-        #       field: 'published_on',
-        #       interval: 'week'
-        #     },
-        #     facet_filter: {}
-        #   }
-        # }
+        filter: {}
       }
 
       unless query.blank?
@@ -269,53 +240,8 @@ module Searchable
   
           __set_availability_filters.(:availability, f)
         end 
-        debugger
         __set_filters.(:availability, @availability_filter)
       end
-
-
-      # if options[:author]
-      #   f = { term: { 'authors.full_name.raw' => options[:author] } }
-
-      #   __set_filters.(:categories, f)
-      #   __set_filters.(:published, f)
-      # end
-
-      # if options[:published_week]
-      #   f = {
-      #     range: {
-      #       published_on: {
-      #         gte: options[:published_week],
-      #         lte: "#{options[:published_week]}||+1w"
-      #       }
-      #     }
-      #   }
-
-      #   __set_filters.(:categories, f)
-      #   __set_filters.(:authors, f)
-      # end
-
-      # if query.present? && options[:comments]
-      #   @search_definition[:query][:bool][:should] ||= []
-      #   @search_definition[:query][:bool][:should] << {
-      #     nested: {
-      #       path: 'comments',
-      #       query: {
-      #         multi_match: {
-      #           query: query,
-      #           fields: ['body'],
-      #           operator: 'and'
-      #         }
-      #       }
-      #     }
-      #   }
-      #   @search_definition[:highlight][:fields].update 'comments.body' => { fragment_size: 50 }
-      # end
-
-      # if options[:sort]
-      #   @search_definition[:sort]  = { options[:sort] => 'desc' }
-      #   @search_definition[:track_scores] = true
-      # end
 
       unless query.blank?
         @search_definition[:suggest] = {
@@ -334,8 +260,6 @@ module Searchable
           }
         }
       end
-
-      debugger
       __elasticsearch__.search(@search_definition)
     end
 
