@@ -34,7 +34,10 @@ module Searchable
           indexes :session_time_in_sec, type: 'multi_field'
         end
 
-        indexes :specializations, analyzer: 'keyword'
+        indexes :specializations do#, analyzer: 'keyword'
+          indexes :id, index: :not_analyzed
+          indexes :name, type: 'keyword'
+        end
       end
     end
 
@@ -50,9 +53,10 @@ module Searchable
     def as_indexed_json(options={})
       hash = self.as_json(
         include: { 
-                   openings:   { only: [:start_time, :end_time, :session_time_in_sec, :status] }
+                   openings:   { only: [:start_time, :end_time, :session_time_in_sec, :status] },
+                   specializations: {only: [:name, :id]}
                  })
-      hash['specializations'] = self.specializations.map(&:name)
+      # hash['specializations'] = self.specializations.map(&:name)
       hash
     end
 
@@ -128,6 +132,7 @@ module Searchable
         # @search_definition[:sort]  = { published_on: 'desc' }
       end
 
+      #accepts a range of float values
       if options[:price]
         f = {
           range: {
@@ -140,6 +145,7 @@ module Searchable
         __set_filters.(:price, f)
       end
 
+      #accepts integer avg_rating
       if options[:avg_rating]
         f = {
           range: {
@@ -159,6 +165,14 @@ module Searchable
           }
         }
         __set_filters.(:gender, f)
+      end
+
+      #accepts specialization ids as integer values = [1,2]
+      if options[:specializations]
+        f = { terms: { "specializations.id" =>  options[:specializations] } }
+
+        __set_filters.(:specializations, f)
+        # __set_filters.(:published, f)
       end
 
 
