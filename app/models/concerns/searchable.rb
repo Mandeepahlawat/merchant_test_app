@@ -91,7 +91,7 @@ module Searchable
             should: [
               { multi_match: {
                   query: query,
-                  fields: ['name^1', 'about^2', 'specializations.name^3, gender, price, avg_rating'],
+                  fields: ['name^1', 'about^2', 'specializations.name^3'],
                   operator: 'and'
                 }
               }
@@ -104,7 +104,7 @@ module Searchable
       end
 
       #accepts price range as a hash of start_val and end_val; float values
-      if options[:price]
+      if options[:price][:start_val] && options[:price][:end_val]
         f = {
           range: {
             price: {
@@ -147,7 +147,7 @@ module Searchable
       end
 
       #accepts session_length as a hash of start_val and end_val
-      if options[:session_length]
+      if options[:session_length][:start_val] && options[:session_length][:start_val]
         f = {
           range: {
             "openings.session_time_in_sec" => {
