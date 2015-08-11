@@ -1,0 +1,9 @@
+.pull-left.result-count
+  = merchants.count
+  search Results Found
+.pull-right
+  %span
+    Sort By
+    |
+  - Merchant::SORT_ORDER.each do |key, value|
+    = link_to value.humanize, "#", class: "#{'active' if @order_by.first[0] == key} sort-link", data: {sort_order: key}

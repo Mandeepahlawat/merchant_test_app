@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  email: MyString
+  status: 1
+  about: MyText
+  gender: 1
+  price: 1.5
+  review_count: 1
+  avg_rating: 1.5
+
+two:
+  name: MyString
+  email: MyString
+  status: 1
+  about: MyText
+  gender: 1
+  price: 1.5
+  review_count: 1
+  avg_rating: 1.5

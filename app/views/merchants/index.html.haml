@@ -1,0 +1,74 @@
+#main-container
+  .container
+    .row
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12.sort-block
+        = render "sort_links", merchants: @merchants
+      .clearfix
+      %hr
+      .col-xs-12.col-sm-12.col-md-12.col-lg-12.clearfix
+        .pull-left.filters-heading
+          Filters
+      .col-xs-12.col-sm-12.col-md-3.col-lg-3
+        = form_for merchants_path, html: {class: "search"}, remote: true, method: :get do |f|
+          = hidden_field_tag "sort_by", @order_by.first[0], id: "sort-order-input"
+          .panel.panel-default.filter-panel
+            .panel-heading
+              %h4 Specialization
+            .panel-body
+              %ul#cat-navi.nav.nav-list.hidden-sm.hidden-xs
+                - @specializations.each do |specialization|
+                  .checkbox
+                    %label
+                      = check_box_tag "specialization_ids[]" ,specialization.id
+                      = specialization.name
+              .visible-xs
+                = select_tag "specialization_ids[]", options_for_select(@specializations.collect{|s| [s.name, s.id]}), multiple: true, class: "mutiple-select"
+
+          .panel.panel-default.filter-panel#price-panel
+            .panel-heading
+              %h4 Price Per Session(&#36;)
+            .panel-body
+              %b 0
+              = text_field_tag "price", {} ,id: "price-filter", data: {slider_value: "[#{Merchant.minimum('price')}, #{Merchant.maximum('price')}]", slider_max: "#{Merchant.maximum('price')}", slider_min: "0" ,slider_step: "10"}
+              %b= Merchant.maximum('price')
+
+          .panel.panel-default.filter-panel
+            .panel-heading
+              %h4 Ratings
+            .panel-body
+              = text_field_tag "ratings", {}, id: "ratings-filter", data: {slider_tricks: "[1, 2, 3, 4, 5]", slider_ticks_labels: "['1', '2', '3', '4', '5']"}
+
+          .panel.panel-default.filter-panel#session-panel
+            .panel-heading
+              %h4 Session Length
+            .panel-body
+              %b 0
+              = text_field_tag "session", {} ,id: "session-filter", data: {slider_value: "[0, 50]", slider_max: "50", slider_min: "0" ,slider_step: "10"}
+              %b 50+
+
+          .panel.panel-default.filter-panel
+            .panel-heading
+              %h4 Gender
+            .panel-body
+              %ul#cat-navi.nav.nav-list.hidden-sm.hidden-xs
+                - Merchant.genders.each do |gender, value|
+                  .checkbox
+                    %label
+                      = check_box_tag "gender_ids[]", value
+                      = gender.humanize
+              .visible-xs
+                = select_tag "gender_ids[]", options_for_select(Merchant.genders.collect{|gender, val| [gender.humanize, val]}), multiple: true, class: "mutiple-select"
+          .panel.panel-default.filter-panel
+            .panel-heading
+              %h4 Availibility
+            .panel-body
+              %ul#cat-navi.nav.nav-list.hidden-sm.hidden-xs
+                - Opening::AVAILABILITY.each do |key, availibility|
+                  .checkbox
+                    %label
+                      = check_box_tag "available_ids[]", key
+                      = availibility.humanize
+              .visible-xs
+                = select_tag "available_ids[]", options_for_select(Opening::AVAILABILITY.collect{|key, val| [val.humanize, key]}), multiple: true, class: "mutiple-select"
+      .col-xs-12.col-sm-12.col-md-9.col-lg-9.merchants
+        = render "index", merchants: @merchants

@@ -1,0 +1,34 @@
+- merchants.each do |merchant|
+  .row.merchant-block
+    .col-sm-12.col-lg-12
+      .panel.panel-default
+        .panel-body
+          .row
+            .col-sm-9.col-lg-9.info-block
+              .col-sm-3.col-lg-3.pull-left
+                .image-container.text-center
+                  = image_tag("user.jpg", class: "image")
+              .col-sm-9.col-lg-9.clearfix
+                .pull-left
+                  .name
+                    %em= merchant.name.humanize
+                .pull-right
+                  .rating
+                    Ratings:
+                    %span.rating-block 
+                      %strong= merchant.avg_rating
+                .clearfix
+                %p.about-info= truncate merchant.about
+                %p.merchant-tags
+                  - merchant.specializations.each do |specialization|
+                    %span.badge= specialization.name
+                %p.price-info= "#{number_to_currency merchant.price}/session"
+            .col-sm-3.col-lg-3.clearfix.schedule-block.text-center
+              - merchant.openings.upto_tomorrow.each_slice(2) do |openings|
+                .clearfix.text-left
+                  - openings.each do |opening|
+                    .pull-left.date-block
+                      %div.date
+                        %strong= opening.start_time.strftime("%a, %d %b")
+                      = opening.start_time.strftime("%H:%M")
+              = link_to "Show More", "#", class: "btn btn-info btn-xs show-more"

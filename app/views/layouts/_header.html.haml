@@ -1,0 +1,17 @@
+%nav.navbar.navbar-inverse.navbar-fixed-top
+  .container
+    .navbar-header
+      %button.navbar-toggle.collapsed{"aria-controls" => "navbar", "aria-expanded" => "false", "data-target" => "#navbar", "data-toggle" => "collapse", :type => "button"}
+        %span.sr-only Toggle navigation
+        %span.icon-bar
+        %span.icon-bar
+        %span.icon-bar
+      %a.navbar-brand{:href => "/"} Merchant App
+    #navbar.navbar-collapse.collapse{"aria-expanded" => "false", :style => "height: 1px;"}
+      = form_for merchants_path, html: {class: "navbar-form navbar-right"}, remote: true, method: :get do |f|
+        = text_field_tag "search"," ",class: "form-control", placeholder: "Search..."
+      %ul.nav.navbar-nav.navbar-right
+        %li
+          %a{:href => "#"} How it works
+        %li
+          %a{:href => "#"} How do I Benifit
