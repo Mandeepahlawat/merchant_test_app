@@ -132,7 +132,7 @@ module Searchable
         # @search_definition[:sort]  = { published_on: 'desc' }
       end
 
-      #accepts a range of float values
+      #accepts price range as a hash of start_val and end_val; float values
       if options[:price]
         f = {
           range: {
@@ -173,6 +173,20 @@ module Searchable
 
         __set_filters.(:specializations, f)
         # __set_filters.(:published, f)
+      end
+
+      #accepts session_length as a hash of start_val and end_val
+      if options[:session_length]
+        f = {
+          range: {
+            "openings.session_time_in_sec" => {
+              # convert session length from minutes to seconds
+              gte: (options[:session_length][:start_val] * 60),
+              lte: (options[:session_length][:end_val] * 60)
+            }
+          }
+        }
+        __set_filters.(:session_length, f)
       end
 
 
