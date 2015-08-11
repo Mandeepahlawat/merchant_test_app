@@ -140,6 +140,17 @@ module Searchable
         __set_filters.(:price, f)
       end
 
+      if options[:avg_rating]
+        f = {
+          range: {
+            avg_rating: {
+              lte: options[:avg_rating]
+            }
+          }
+        }
+        __set_filters.(:avg_rating, f)
+      end
+
 
       # if options[:author]
       #   f = { term: { 'authors.full_name.raw' => options[:author] } }
