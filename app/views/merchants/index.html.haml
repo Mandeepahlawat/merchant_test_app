@@ -54,7 +54,7 @@
                 - Merchant.genders.each do |gender, value|
                   .checkbox
                     %label
-                      = check_box_tag "gender_ids[]", value
+                      = check_box_tag "gender_ids[]", gender
                       = gender.humanize
               .visible-xs
                 = select_tag "gender_ids[]", options_for_select(Merchant.genders.collect{|gender, val| [gender.humanize, val]}), multiple: true, class: "mutiple-select"
