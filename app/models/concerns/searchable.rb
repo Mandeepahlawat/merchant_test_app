@@ -98,9 +98,10 @@ module Searchable
             ]
           }
         }
+        @search_definition[:sort]  = options[:sort_by].values.first
       else
         @search_definition[:query] = { match_all: {} }
-        # @search_definition[:sort]  = { published_on: 'desc' }
+        @search_definition[:sort]  = options[:sort_by].values.first 
       end
 
       #accepts price range as a hash of start_val and end_val; float values
