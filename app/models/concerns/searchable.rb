@@ -189,6 +189,90 @@ module Searchable
         __set_filters.(:session_length, f)
       end
 
+      if options[:availability]
+        @availability_filter = {}
+        __set_availability_filters = lambda do |key, f|
+          @availability_filter[:or] ||= []
+          @availability_filter[:or]  |= [f]
+        end
+
+        if options[:availability].include? "1"
+          f = {
+                and: [
+                  {term: {"openings.start_time" => Time.zone.now}},
+                  {term: {"openings.status" => "available"}}
+                ]
+              }
+          __set_availability_filters.(:availability, f)
+          # __set_availability_filters.(f)
+        end
+
+        #available from next days 9:00 - 12:00
+        if options[:availability].include? "2"
+          next_day_morning = 1.day.from_now.beginning_of_day + 9.hours
+
+          f = __check_by_availability_time(next_day_morning, (next_day_morning + 3.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        # available from next days 12:00 - 16:00
+        if options[:availability].include? "3"
+          next_day_afternoon = 1.day.from_now.beginning_of_day + 12.hours
+
+          f = __check_by_availability_time(next_day_afternoon, (next_day_afternoon + 4.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        # available from next days 16:00 - 19:00
+        if options[:availability].include? "4"
+          next_day_evening = 1.day.from_now.beginning_of_day + 16.hours
+
+          f = __check_by_availability_time(next_day_evening, (next_day_evening + 3.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        # available from next days 19:00 - 22:00
+        if options[:availability].include? "5"
+          next_day_night = 1.day.from_now.beginning_of_day + 19.hours
+
+          f = __check_by_availability_time(next_day_night, (next_day_night + 3.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        #available today
+        if options[:availability].include? "6"
+          start_of_today = Time.zone.now.beginning_of_day
+
+          f = __check_by_availability_time(start_of_today, (start_of_today + 24.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        # available tomorrow
+        if options[:availability].include? "7"
+          start_of_next_day = 1.day.from_now.beginning_of_day
+
+          f = __check_by_availability_time(start_of_next_day, (start_of_next_day + 24.hours))
+  
+          __set_availability_filters.(:availability, f)
+        end
+
+        # available this week
+        if options[:availability].include? "8"
+          start_of_this_week = Time.zone.now.at_beginning_of_week
+
+          f = __check_by_availability_time(next_day_night, (start_of_this_week + 7.days))
+  
+          __set_availability_filters.(:availability, f)
+        end 
+        debugger
+        __set_filters.(:availability, @availability_filter)
+      end
+
 
       # if options[:author]
       #   f = { term: { 'authors.full_name.raw' => options[:author] } }
@@ -253,6 +337,22 @@ module Searchable
 
       debugger
       __elasticsearch__.search(@search_definition)
+    end
+
+    def self.__check_by_availability_time(start_val,end_val)
+      {
+        and: [
+          {
+            range: {
+              "openings.start_time" => {
+                gte: start_val,
+                lte: end_val
+              }
+            }
+          },
+          {term: {"openings.status" => "available"}}
+        ]
+      }
     end
   end
 end
