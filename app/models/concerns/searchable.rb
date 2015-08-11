@@ -153,8 +153,8 @@ module Searchable
           range: {
             "openings.session_time_in_sec" => {
               # convert session length from minutes to seconds
-              gte: (options[:session_length][:start_val] * 60),
-              lte: (options[:session_length][:end_val] * 60)
+              gte: (options[:session_length][:start_val].to_i * 60),
+              lte: (options[:session_length][:end_val].to_i * 60)
             }
           }
         }
