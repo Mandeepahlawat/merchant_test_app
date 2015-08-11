@@ -151,6 +151,16 @@ module Searchable
         __set_filters.(:avg_rating, f)
       end
 
+      #accepts string values = ["female", "male", "other"]
+      if options[:genders]
+        f = {
+          terms: {
+            gender: options[:genders]
+          }
+        }
+        __set_filters.(:gender, f)
+      end
+
 
       # if options[:author]
       #   f = { term: { 'authors.full_name.raw' => options[:author] } }
